@@ -22,7 +22,7 @@ def logout():
     st.session_state.user_type = None
     st.session_state.user_id = None
     st.session_state.current_page = None
-    st.experimental_rerun()  # correct rerun method
+    st.rerun()  # correct rerun method
 
 if not st.session_state.logged_in:
     phone = st.text_input("Enter WhatsApp Number")
@@ -32,14 +32,14 @@ if not st.session_state.logged_in:
             st.session_state.user_type = "admin"
             st.session_state.user_id = phone
             st.session_state.current_page = "admin"  # direct to admin dashboard on login
-            st.experimental_rerun()
+            st.rerun()
 
         elif get_student_data(phone):
             st.session_state.logged_in = True
             st.session_state.user_type = "student"
             st.session_state.user_id = phone
             st.session_state.current_page = "student"  # direct to student dashboard on login
-            st.experimental_rerun()
+            st.rerun()
 
         else:
             st.error("Invalid user. Contact admin.")
@@ -57,12 +57,12 @@ else:
     if st.session_state.user_type == "admin" and st.session_state.current_page != "admin":
         if st.button("Go to Admin Dashboard"):
             st.session_state.current_page = "admin"
-            st.experimental_rerun()
+            st.rerun()
 
     elif st.session_state.user_type == "student" and st.session_state.current_page != "student":
         if st.button("Go to Student Dashboard"):
             st.session_state.current_page = "student"
-            st.experimental_rerun()
+            st.rerun()
 
     if st.button("Logout"):
         logout()
