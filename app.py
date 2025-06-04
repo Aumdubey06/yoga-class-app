@@ -69,15 +69,16 @@ else:
     st.success(f"Logged in as {st.session_state.user_type.capitalize()}: {st.session_state.user_id}")
 
     # Navigation buttons if you want to allow switching dashboards without logout
-    if st.session_state.user_type == "admin" and st.session_state.current_page != "admin":
+    if st.session_state.user_type == "admin":
         if st.button("Go to Admin Dashboard"):
-            st.session_state.current_page = "admin"
-            st.rerun()
+        st.session_state.current_page = "admin"
+        st.rerun()
 
-    elif st.session_state.user_type == "student" and st.session_state.current_page != "student":
+    elif st.session_state.user_type == "student":
         if st.button("Go to Student Dashboard"):
-            st.session_state.current_page = "student"
-            st.rerun()
+        st.session_state.current_page = "student"
+        st.rerun()
+
 
     if st.button("Logout"):
         logout()
