@@ -1,22 +1,29 @@
-import os
-import json
 import streamlit as st
+import json
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, firestore
 
-# Load your service account JSON from secrets
+# Load and parse the service account JSON from Streamlit secrets
 service_account_json_str = st.secrets["SERVICE_ACCOUNT_JSON"]
-
-# Parse the JSON string to a dictionary
 service_account_info = json.loads(service_account_json_str)
 
-# Initialize Firebase admin with credentials
-cred = credentials.Certificate(service_account_info)
-
+# Initialize Firebase
 if not firebase_admin._apps:
+    cred = credentials.Certificate(service_account_info)
     firebase_admin.initialize_app(cred)
-# Firestore DB
+
+# Now Firestore can be used
 db = firestore.client()
+
+# Example Firestore usage
+st.title("Yoga App")
+st.success("Firebase & Firestore Initialized!")
+
+# Try reading a sample collection
+docs = db.collection("students").stream()
+for doc in docs:
+    st.write(f"{doc.id} => {doc.to_dict()}")
+
 # Now you can use firebase_admin as usual
 
 # Import utilities and dashboards
