@@ -2,19 +2,22 @@ import os
 import json
 import streamlit as st
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials
 
-# Set GRPC resolver to native (recommended for Firebase)
-os.environ["GRPC_DNS_RESOLVER"] = "native"
+# Load your service account JSON from secrets
+service_account_json_str = st.secrets["SERVICE_ACCOUNT_JSON"]
 
-# Initialize Firebase only once
+# Parse the JSON string to a dictionary
+service_account_info = json.loads(service_account_json_str)
+
+# Initialize Firebase admin with credentials
+cred = credentials.Certificate(service_account_info)
+
 if not firebase_admin._apps:
-    cred_dict = json.loads(st.secrets["SERVICE_ACCOUNT_JSON"])
-    cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred)
-
 # Firestore DB
 db = firestore.client()
+# Now you can use firebase_admin as usual
 
 # Import utilities and dashboards
 from utils.auth import is_admin, get_student_data
