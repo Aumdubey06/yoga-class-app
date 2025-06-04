@@ -3,6 +3,10 @@ import json
 import firebase_admin
 from firebase_admin import credentials, firestore
 
+# Page setup
+st.set_page_config(page_title="Yoga App", layout="centered")
+st.title("Yoga Class Login")
+
 # Load and parse the service account JSON from Streamlit secrets
 service_account_json_str = st.secrets["SERVICE_ACCOUNT_JSON"]
 service_account_info = json.loads(service_account_json_str)
@@ -12,28 +16,13 @@ if not firebase_admin._apps:
     cred = credentials.Certificate(service_account_info)
     firebase_admin.initialize_app(cred)
 
-# Now Firestore can be used
+# Initialize Firestore client
 db = firestore.client()
-
-# Example Firestore usage
-st.title("Yoga App")
-st.success("Firebase & Firestore Initialized!")
-
-# Try reading a sample collection
-docs = db.collection("students").stream()
-for doc in docs:
-    st.write(f"{doc.id} => {doc.to_dict()}")
-
-# Now you can use firebase_admin as usual
 
 # Import utilities and dashboards
 from utils.auth import is_admin, get_student_data
 import pages.admin_dashboard as admin_dashboard
 import pages.student_dashboard as student_dashboard
-
-# Page setup
-st.set_page_config(page_title="Yoga App", layout="centered")
-st.title("Yoga Class Login")
 
 # Session state setup
 if "logged_in" not in st.session_state:
@@ -69,15 +58,9 @@ if not st.session_state.logged_in:
         else:
             st.error("Invalid user. Contact admin.")
 else:
-    # Debug info (optional)
-    st.write(f"DEBUG: logged_in={st.session_state.logged_in}")
-    st.write(f"DEBUG: user_type={st.session_state.user_type}")
-    st.write(f"DEBUG: user_id={st.session_state.user_id}")
-    st.write(f"DEBUG: current_page={st.session_state.current_page}")
-
     st.success(f"Logged in as {st.session_state.user_type.capitalize()}: {st.session_state.user_id}")
 
-    # Show dashboard navigation buttons (always visible)
+    # Navigation buttons
     if st.session_state.user_type == "admin":
         if st.button("Go to Admin Dashboard"):
             st.session_state.current_page = "admin"
@@ -92,7 +75,7 @@ else:
     if st.button("Logout"):
         logout()
 
-    # Show current dashboard
+    # Show correct dashboard
     if st.session_state.current_page == "admin":
         admin_dashboard.show()
     elif st.session_state.current_page == "student":
