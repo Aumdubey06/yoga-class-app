@@ -10,6 +10,7 @@ st.set_page_config(page_title="Yoga App", layout="centered")
 
 st.title("Yoga Class Login")
 
+# Initialize session state variables
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.user_type = None
@@ -21,7 +22,7 @@ def logout():
     st.session_state.user_type = None
     st.session_state.user_id = None
     st.session_state.current_page = None
-    st.rerun()
+    st.experimental_rerun()  # correct rerun method
 
 if not st.session_state.logged_in:
     phone = st.text_input("Enter WhatsApp Number")
@@ -30,20 +31,21 @@ if not st.session_state.logged_in:
             st.session_state.logged_in = True
             st.session_state.user_type = "admin"
             st.session_state.user_id = phone
-            st.session_state.current_page = None
-            st.rerun()
+            st.session_state.current_page = "admin"  # direct to admin dashboard on login
+            st.experimental_rerun()
 
         elif get_student_data(phone):
             st.session_state.logged_in = True
             st.session_state.user_type = "student"
             st.session_state.user_id = phone
-            st.session_state.current_page = None
-            st.rerun()
+            st.session_state.current_page = "student"  # direct to student dashboard on login
+            st.experimental_rerun()
 
         else:
             st.error("Invalid user. Contact admin.")
 
 else:
+    # Show debug info (optional, remove for production)
     st.write(f"DEBUG: logged_in={st.session_state.logged_in}")
     st.write(f"DEBUG: user_type={st.session_state.user_type}")
     st.write(f"DEBUG: user_id={st.session_state.user_id}")
@@ -51,20 +53,24 @@ else:
 
     st.success(f"Logged in as {st.session_state.user_type.capitalize()}: {st.session_state.user_id}")
 
-    if st.session_state.user_type == "admin":
+    # Navigation buttons if you want to allow switching dashboards without logout
+    if st.session_state.user_type == "admin" and st.session_state.current_page != "admin":
         if st.button("Go to Admin Dashboard"):
             st.session_state.current_page = "admin"
-            st.rerun()
-    elif st.session_state.user_type == "student":
+            st.experimental_rerun()
+
+    elif st.session_state.user_type == "student" and st.session_state.current_page != "student":
         if st.button("Go to Student Dashboard"):
             st.session_state.current_page = "student"
-            st.rerun()
+            st.experimental_rerun()
 
     if st.button("Logout"):
         logout()
 
+    # Show the dashboard based on current page
     if st.session_state.current_page == "admin":
         admin_dashboard.show()
-
     elif st.session_state.current_page == "student":
         student_dashboard.show()
+    else:
+        st.info("Please select a dashboard.")
